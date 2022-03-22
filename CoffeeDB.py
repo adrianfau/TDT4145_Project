@@ -34,17 +34,24 @@ def valueForMoney():
 
 
 def searchKeyword():
-    keyword = input("\nEnter a keyword to search for: ")
+    keyword = lower(input("\nEnter a keyword to search for: "))
     for row in cursor.execute("SELECT Coffee.CoffeeNames, Coffee.Roastery"
                     "FROM Post INNER JOIN Coffee ON Post.CoffeeID = Coffee.CoffeeID" 
-                    "WHERE CONTAINS(Post.Notes, keyword=:keyword) OR CONTAINS(Coffee.Description, keyword=:keyword)", {"keyword": lower(keyword)}):
+                    "WHERE CONTAINS(LOWER(Post.Notes), keyword=:keyword) OR CONTAINS(LOWER(Coffee.Description), keyword=:keyword)", {"keyword": keyword}):
                     print(row)
         
 
 def includeCountriesExcludeMethod():
-    countries = input("Enter up to three countries to search for: ")
-    method = input("Enter a method to exclude.")
-    for row in cursor.execute("SELECT"):
+    countryInput = split(lower(input("Enter up to three countries to search for: ")))
+    countries = [countryInput.append(None) for i in range(3-len(x))]
+    method = lower(input("Enter a method to exclude."))
+    for row in cursor.execute("SELECT Coffee.CoffeeName, Coffee.Roastery FROM Coffee
+                                "INNER JOIN Batch ON Coffee.BatchID = Batch.BatchID"
+
+                                "WHERE (method=:method IS NULL OR LOWER(ProcessingMethod.Name) <> method=:method)"
+                                "AND (country1=:country1 IS NULL OR LOWER(Farm.Country) = country1=:country1"
+                                "AND (country2=:country2 IS NULL OR LOWER(Farm.Country) = country2=:country2"
+                                "AND (country3=:country3 IS NULL OR LOWER(Farm.Country) = country3=:country3"), {"method": method, "country1": countries[0], "country2": countries[1], "country3": countries[3]}):
         print("row")
 
 functionList = [postNote, printTopUsers, valueForMoney, searchKeyword, includeCountriesExcludeMethod]
