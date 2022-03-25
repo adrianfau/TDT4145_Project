@@ -1,4 +1,3 @@
-print("banana")
 import sqlite3
 con = sqlite3.connect("CoffeeDB.db")
 
@@ -6,17 +5,20 @@ cursor = con.cursor()
 cursor.execute("SELECT * FROM sqlite_master")
 con.close()
 
-#To add data to database: Add Farm, Add ProcessingMethod, Add User, Add Bean, Add Batch, Add BeanInBatch, add Coffee, Add Post
+#To add data to database: Add Farm, ProcessingMethod, User. Then add Bean, add Batch, add BeanInBatch. Then add Coffee, then add Post
 
 def postNote():
     print("Post New Note to CoffeeDB")
     roastery = input("Roastery: ")
     coffeeName = input("Coffee Name: ")
     points = input("Points Score: ")
+    if 0 <= points <= 10:
+        print("asdasd")
+    else:
+        print("asdasd")
     notes = input("Notes: ")
 
     print(f"New Post posted!\n\n")
-
 
 def printTopUsers():
     print("Printing Top Coffee Drinkers This Year")
@@ -26,7 +28,6 @@ def printTopUsers():
                     "ORDER BY COUNT(P.UserID) DESC"):
                     print(row)
 
-
 def valueForMoney():
     print("Printing Highest Average Score to Price Ratio")
     for row in cursor.execute("SELECT C.name, C.priceperkilo, C.roastery, AVG(P.points)/C.priceperkilo AS AvgScoreToPriceRatio"
@@ -34,19 +35,17 @@ def valueForMoney():
                                 "WHERE C.CoffeeID = P.CoffeeID ORDER BY AvgScoreToPriceRatio DESC"):
                     print(row)
 
-
 def searchKeyword():
-    keyword = lower(input("\nEnter a keyword to search for: "))
+    keyword = input("\nEnter a keyword to search for: ").lower()
     for row in cursor.execute("Select C.name, C.roastery"
                                 "FROM Coffee AS C LEFT JOIN Post AS P ON P.CoffeeID = C.CoffeeID"
                                 "WHERE P.tastingnotes LIKE keyword=:keyword OR C.description LIKE keyword=:keyword", {"keyword": keyword}):
                     print(row)
         
-
 def includeCountriesExcludeMethod():
-    countryInput = split(lower(input("Enter up to three countries to search for: ")))
-    countries = [countryInput.append(None) for i in range(3-len(x))]
-    method = lower(input("Enter a method to exclude."))
+    countryInput = (input("Enter up to three countries to search for: ").lower()).split()
+    countries = [countryInput.append(None) for i in range(3-len(countryInput))]
+    method = input("Enter a method to exclude.").lower()
     for row in cursor.execute("SELECT Coffee.CoffeeName, Coffee.Roastery FROM Coffee"
                                 "INNER JOIN Batch ON Coffee.BatchID = Batch.BatchID"
 
@@ -56,7 +55,7 @@ def includeCountriesExcludeMethod():
                                 "AND (country3=:country3 IS NULL OR LOWER(Farm.Country) = country3=:country3", {"method": method, "country1": countries[0], "country2": countries[1], "country3": countries[3]}):
         print("row")
 
-while True:
+while True: #Login check
     print("Welcome to CoffeeDB.")
     email = input("Please enter email: ")
     password = input("Please enter password: ")
@@ -70,7 +69,7 @@ while True:
 
 functionList = [postNote, printTopUsers, valueForMoney, searchKeyword, includeCountriesExcludeMethod]
 
-while True:
+while True: #Main program loop
     print("""Functions:
     1 | Post Note
     2 | Print Top Coffee Tasters This Year
