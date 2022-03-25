@@ -9,16 +9,36 @@ con = sqlite3.connect("CoffeeDB.db")
 # kraemer@ntnu.no | 123 | Frank Alexander Kraemer
 
 def postNote():
-    print("Post New Note to CoffeeDB")
+    print("Post New Note to CoffeeDB:")
     roastery = input("Roastery: ")
     coffeeName = input("Coffee Name: ")
-    points = int(input("Points Score: "))
-    if 0 <= points <= 10:
-        print("asdasd")
-    else:
-        print("asdasd")
+    while True:
+        points = int(input("Points Score: "))
+        if not 0 <= points <= 10:
+            print("Please enter a valid score. ")
+        break
+
     notes = input("Notes: ")
-    print(f"New Post posted!\n\n")
+    cursor = con.cursor()
+    print("List of roasteries: ")
+    for row in cursor.execute("SELECT DISTINCT roastery FROM Coffee"):
+        print(row)
+    inRoastery = input("Select which roastery your coffee is from.")
+    roasteryTest = cursor.execute("SELECT Roastery FROM Coffee INNER JOIN Post ON Coffee.CoffeeID = Post.coffeeID")
+    # cursor.execute("INSERT INTO Post (tastingnotes, points) VALUES ({tastingnotes}, {points})")
+    # val = (tastingnotes, points)
+    # cursor.execute(sql, val)
+    cursor.execute("SELECT UserID FROM User WHERE email=:email", {"email": email})
+    myID = cursor.fetchone()
+    myID = int(myID[0])
+    cursor.execute("SELECT CoffeeID FROM Coffee WHERE name=:name", {"name": coffeeName})
+    coffeeID = cursor.fetchone()
+    coffeeID = int(coffeeID[0])
+
+    cursor.execute("INSERT INTO Post (tastingnotes, tastingdate, UserID, CoffeeID, points) VALUES (?, CURRENT_DATE, ?, ?, ?)", (notes, myID, 1, points,))
+
+    con.commit()
+    print(f"\nNew Post posted!")
 
 def printTopUsers():
     print("\n\nPrinting Top Coffee Drinkers This Year\nName | Cups of coffee drunk")
@@ -44,9 +64,9 @@ def includeCountriesExcludeMethod():
     for row in cursor.execute("SELECT country FROM Farm"):
         print(row)
     countryInput = (input("Enter up to two countries to search for, separated by a space: ").lower()).split()
-    if len(countryInput > 2):
+    if len(countryInput) > 2:
         print("Please select MAX 2 countries.")
-        continue
+        includeCountriesExcludeMethod()
     countries = countryInput
     for i in range (2 - len(countryInput)):
         countries.append(None)
@@ -59,9 +79,9 @@ def includeCountriesExcludeMethod():
     method = input("Enter a method to exclude: ").lower()
     print(countries)
 
-    print(f"Searching for coffees that are not {method} from countries {countries}.")
+    print(f"\nSearching for coffees that are not {method} from countries {countries}.")
     cursor = con.cursor()
-    for row in cursor.execute("SELECT C.name, C.roastery FROM Coffee AS C INNER JOIN Batch AS B ON Coffee.BatchID = B.BatchID INNER JOIN ProcessingMethod AS P on B.ProcessingMethodID = P.ProcessingMethodID INNER JOIN Farm AS F WHERE B.FarmID = F.FarmID AND (P.name=:method IS NULL OR P.name IS NOT =:method) AND ((F.country=:country1 IS NULL OR LOWER(F.country) =:country1) OR (F.country=:country2 IS NULL OR LOWER(F.country) =:country2))", {"method": method, "country1": countries[0], "country2": countries[1]):
+    for row in cursor.execute("SELECT C.name, C.roastery FROM Coffee AS C INNER JOIN Batch AS B ON C.BatchID = B.BatchID INNER JOIN ProcessingMethod AS P on B.ProcessingMethodID = P.ProcessingMethodID INNER JOIN Farm AS F WHERE B.FarmID = F.FarmID AND P.name IS NOT :method AND ((:country1 IS NULL OR LOWER(F.country) =:country1) OR (:country2 IS NULL OR LOWER(F.country) =:country2))", {"method": method, "country1": countries[0], "country2": countries[1]}):
                     print(row)
 
 while True: #Login check
