@@ -20,26 +20,26 @@ def postNote():
 
 def printTopUsers():
     print("Printing Top Coffee Drinkers This Year")
-    for row in cursor.execute("SELECT User.UserID, User.FullName, COUNT(Post.UserID)"
-                    "WHERE Post.UserID = User.UserID AND Post.TastingDate = '2022'" 
-                    "GROUP BY User.UserID" 
-                    "ORDER BY COUNT(Post.UserID) DESC"):
+    for row in cursor.execute("SELECT U.UserID, U.FullName, COUNT(P.UserID) AS CoffeesDrunk FROM User AS U LEFT JOIN Post AS P"
+                    "WHERE P.UserID = U.UserID AND P.tastingdate LIKE '%2022%'"
+                    "GROUP BY U.UserID"
+                    "ORDER BY COUNT(P.UserID) DESC"):
                     print(row)
 
 
 def valueForMoney():
     print("Printing Highest Average Score to Price Ratio")
-    for row in cursor.execute("SELECT Coffee.CoffeeID, Coffee.CoffeeName, Coffee.Price, Post.CoffeeID, Post.Points"
-                    ""
-                    ""):
+    for row in cursor.execute("SELECT C.name, C.priceperkilo, C.roastery, AVG(P.points)/C.priceperkilo AS AvgScoreToPriceRatio"
+                                "FROM Coffee AS C LEFT JOIN Post AS P"
+                                "WHERE C.CoffeeID = P.CoffeeID ORDER BY AvgScoreToPriceRatio DESC"):
                     print(row)
 
 
 def searchKeyword():
     keyword = lower(input("\nEnter a keyword to search for: "))
-    for row in cursor.execute("SELECT Coffee.CoffeeNames, Coffee.Roastery"
-                    "FROM Post INNER JOIN Coffee ON Post.CoffeeID = Coffee.CoffeeID" 
-                    "WHERE CONTAINS(LOWER(Post.Notes), keyword=:keyword) OR CONTAINS(LOWER(Coffee.Description), keyword=:keyword)", {"keyword": keyword}):
+    for row in cursor.execute("Select C.name, C.roastery"
+                                "FROM Coffee AS C LEFT JOIN Post AS P ON P.CoffeeID = C.CoffeeID"
+                                "WHERE P.tastingnotes LIKE keyword=:keyword OR C.description LIKE keyword=:keyword", {"keyword": keyword}):
                     print(row)
         
 
@@ -64,7 +64,9 @@ while True:
         login = cursor.execute("SELECT User.Email, User.Password"
                                 "WHERE User.Email IS email=:email"
                                 "AND User.Password IS password=:password", {"email": email, "password": password})
-    except ValueError
+    except ValueError:
+        print("Could not find user. Try again: ")
+        continue
 
 functionList = [postNote, printTopUsers, valueForMoney, searchKeyword, includeCountriesExcludeMethod]
 
