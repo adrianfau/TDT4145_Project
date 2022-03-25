@@ -63,11 +63,10 @@ def includeCountriesExcludeMethod():
                                 "INNER JOIN Batch ON Coffee.BatchID = Batch.BatchID"
                                 "INNER JOIN ProcessingMethod AS P on B.ProcessingMethodID = P.ProcessingMethodID"
                                 "INNER JOIN Farm AS F WHERE B.FarmID = F.FarmID" 
-                                "AND (method=:method IS NULL OR P.name IS NOT method=:method AND"
-                                "WHERE (method=:method IS NULL OR LOWER(ProcessingMethod.Name) <> method=:method)"
-                                "AND (country1=:country1 IS NULL OR LOWER(Farm.Country) = country1=:country1"
-                                "AND (country2=:country2 IS NULL OR LOWER(Farm.Country) = country2=:country2"
-                                "AND (country3=:country3 IS NULL OR LOWER(Farm.Country) = country3=:country3", {"method": method, "country1": countries[0], "country2": countries[1], "country3": countries[3]}):
+                                "AND (method=:method IS NULL OR P.name IS NOT method=:method"
+                                "AND (country1=:country1 IS NULL OR LOWER(F.country) = country1=:country1"
+                                "AND (country2=:country2 IS NULL OR LOWER(F.country) = country2=:country2"
+                                "AND (country3=:country3 IS NULL OR LOWER(F.country) = country3=:country3", {"method": method, "country1": countries[0], "country2": countries[1], "country3": countries[3]}):
                     print(row)
 
 while True: #Login check
