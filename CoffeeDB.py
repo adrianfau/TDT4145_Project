@@ -43,9 +43,12 @@ def includeCountriesExcludeMethod():
     cursor = con.cursor()
     for row in cursor.execute("SELECT country FROM Farm"):
         print(row)
-    countryInput = (input("Enter up to three countries to search for, separated by a space: ").lower()).split()
+    countryInput = (input("Enter up to two countries to search for, separated by a space: ").lower()).split()
+    if len(countryInput > 2):
+        print("Please select MAX 2 countries.")
+        continue
     countries = countryInput
-    for i in range (3 - len(countryInput)):
+    for i in range (2 - len(countryInput)):
         countries.append(None)
     #countries.append(None) = countryInput.append(None) for i in range(3-len(countryInput))
 
@@ -58,7 +61,7 @@ def includeCountriesExcludeMethod():
 
     print(f"Searching for coffees that are not {method} from countries {countries}.")
     cursor = con.cursor()
-    for row in cursor.execute("SELECT C.name, C.roastery FROM Coffee AS C INNER JOIN Batch AS B ON Coffee.BatchID = B.BatchID INNER JOIN ProcessingMethod AS P on B.ProcessingMethodID = P.ProcessingMethodID INNER JOIN Farm AS F WHERE B.FarmID = F.FarmID AND (P.name=:method IS NULL OR P.name IS NOT =:method) AND (F.country=:country1 IS NULL OR LOWER(F.country) =:country1) AND (F.country=:country2 IS NULL OR LOWER(F.country) =:country2) AND (F.country=:country3 IS NULL OR LOWER(F.country) =:country3)", {"method": method, "country1": countries[0], "country2": countries[1], "country3": countries[2]}):
+    for row in cursor.execute("SELECT C.name, C.roastery FROM Coffee AS C INNER JOIN Batch AS B ON Coffee.BatchID = B.BatchID INNER JOIN ProcessingMethod AS P on B.ProcessingMethodID = P.ProcessingMethodID INNER JOIN Farm AS F WHERE B.FarmID = F.FarmID AND (P.name=:method IS NULL OR P.name IS NOT =:method) AND ((F.country=:country1 IS NULL OR LOWER(F.country) =:country1) OR (F.country=:country2 IS NULL OR LOWER(F.country) =:country2))", {"method": method, "country1": countries[0], "country2": countries[1]):
                     print(row)
 
 while True: #Login check
@@ -95,7 +98,7 @@ while True: #Main program loop
         print("Exiting Program.")
         break
     elif not 1 <= initInput <= (len(functionList) + 1) :
-        print("Not a function! Try again.\n\n")
+        print("Not a function! Try again.")
     else:
         functionList[initInput - 1]()
 
