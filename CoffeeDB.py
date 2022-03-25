@@ -6,12 +6,16 @@ cursor.execute("SELECT * FROM sqlite_master")
 con.close()
 
 #To add data to database: Add Farm, ProcessingMethod, User. Then add Bean, add Batch, add BeanInBatch. Then add Coffee, then add Post
+# Example users:
+# adrianfauske@gmail.com | banan | Adrian Nasir Fauske
+# williarh@stud.ntnu.no | eple | William Strand Hassel
+# kraemer@ntnu.no | 123 | Frank Alexander Kraemer
 
 def postNote():
     print("Post New Note to CoffeeDB")
     roastery = input("Roastery: ")
     coffeeName = input("Coffee Name: ")
-    points = input("Points Score: ")
+    points = int(input("Points Score: "))
     if 0 <= points <= 10:
         print("asdasd")
     else:
@@ -43,29 +47,42 @@ def searchKeyword():
                     print(row)
         
 def includeCountriesExcludeMethod():
-    countryInput = (input("Enter up to three countries to search for: ").lower()).split()
+    print("List of available countries: ")
+    for row in cursor.execute("SELECT country FROM Farm"):
+        print(row)
+    countryInput = (input("Enter up to three countries to search for, separated by a space: ").lower()).split()
     countries = [countryInput.append(None) for i in range(3-len(countryInput))]
-    method = input("Enter a method to exclude.").lower()
-    for row in cursor.execute("SELECT Coffee.CoffeeName, Coffee.Roastery FROM Coffee"
-                                "INNER JOIN Batch ON Coffee.BatchID = Batch.BatchID"
 
+    print("\nList of all available processing methods: ")
+    for row in cursor.execute("SELECT name from ProcessingMethod"):
+        print(row)
+    method = input("Enter a method to exclude.").lower()
+
+    print(f"Searching for coffees that are not {method} from countries {countries}.")
+    for row in cursor.execute("SELECT C.name, C.roastery FROM Coffee AS C"
+                                "INNER JOIN Batch ON Coffee.BatchID = Batch.BatchID"
+                                "INNER JOIN ProcessingMethod AS P on B.ProcessingMethodID = P.ProcessingMethodID"
+                                "INNER JOIN Farm AS F WHERE B.FarmID = F.FarmID" 
+                                "AND (method=:method IS NULL OR P.name IS NOT method=:method AND"
                                 "WHERE (method=:method IS NULL OR LOWER(ProcessingMethod.Name) <> method=:method)"
                                 "AND (country1=:country1 IS NULL OR LOWER(Farm.Country) = country1=:country1"
                                 "AND (country2=:country2 IS NULL OR LOWER(Farm.Country) = country2=:country2"
                                 "AND (country3=:country3 IS NULL OR LOWER(Farm.Country) = country3=:country3", {"method": method, "country1": countries[0], "country2": countries[1], "country3": countries[3]}):
-        print("row")
+                    print(row)
 
 while True: #Login check
     print("Welcome to CoffeeDB.")
     email = input("Please enter email: ")
     password = input("Please enter password: ")
     try:
-        login = cursor.execute("SELECT User.Email, User.Password"
-                                "WHERE User.Email IS email=:email"
-                                "AND User.Password IS password=:password", {"email": email, "password": password})
+        login = cursor.execute("SELECT User.email, User.password"
+                                "WHERE User.email IS email=:email"
+                                "AND User.password IS password=:password", {"email": email, "password": password})
     except ValueError:
         print("Could not find user. Try again: ")
         continue
+    name = cursor.execute("SELECT name FROM User WHERE email=:email", {"email": email})
+    print(f"Logged in as {name}\n")
 
 functionList = [postNote, printTopUsers, valueForMoney, searchKeyword, includeCountriesExcludeMethod]
 
@@ -80,10 +97,10 @@ while True: #Main program loop
     try:
         initInput = int(input("Input Desired Function Number: "))
     except ValueError:
-        print("Input an integer. ")
+        print("Input an integer corresponding to a function.")
         continue
     if initInput == 6:
-        print("Exiting Program.\n\n")
+        print("Exiting Program.")
         break
     elif not 1 <= initInput <= (len(functionList) + 1) :
         print("Not a function! Try again.\n\n")
