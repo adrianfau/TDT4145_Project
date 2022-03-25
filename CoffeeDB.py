@@ -6,6 +6,8 @@ cursor = con.cursor()
 cursor.execute("SELECT * FROM sqlite_master")
 con.close()
 
+#To add data to database: Add Farm, Add ProcessingMethod, Add User, Add Bean, Add Batch, Add BeanInBatch, add Coffee, Add Post
+
 def postNote():
     print("Post New Note to CoffeeDB")
     roastery = input("Roastery: ")
@@ -45,14 +47,24 @@ def includeCountriesExcludeMethod():
     countryInput = split(lower(input("Enter up to three countries to search for: ")))
     countries = [countryInput.append(None) for i in range(3-len(x))]
     method = lower(input("Enter a method to exclude."))
-    for row in cursor.execute("SELECT Coffee.CoffeeName, Coffee.Roastery FROM Coffee
+    for row in cursor.execute("SELECT Coffee.CoffeeName, Coffee.Roastery FROM Coffee"
                                 "INNER JOIN Batch ON Coffee.BatchID = Batch.BatchID"
 
                                 "WHERE (method=:method IS NULL OR LOWER(ProcessingMethod.Name) <> method=:method)"
                                 "AND (country1=:country1 IS NULL OR LOWER(Farm.Country) = country1=:country1"
                                 "AND (country2=:country2 IS NULL OR LOWER(Farm.Country) = country2=:country2"
-                                "AND (country3=:country3 IS NULL OR LOWER(Farm.Country) = country3=:country3"), {"method": method, "country1": countries[0], "country2": countries[1], "country3": countries[3]}):
+                                "AND (country3=:country3 IS NULL OR LOWER(Farm.Country) = country3=:country3", {"method": method, "country1": countries[0], "country2": countries[1], "country3": countries[3]}):
         print("row")
+
+while True:
+    print("Welcome to CoffeeDB.")
+    email = input("Please enter email: ")
+    password = input("Please enter password: ")
+    try:
+        login = cursor.execute("SELECT User.Email, User.Password"
+                                "WHERE User.Email IS email=:email"
+                                "AND User.Password IS password=:password", {"email": email, "password": password})
+    except ValueError
 
 functionList = [postNote, printTopUsers, valueForMoney, searchKeyword, includeCountriesExcludeMethod]
 
