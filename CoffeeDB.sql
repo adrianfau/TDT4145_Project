@@ -1,69 +1,19 @@
 BEGIN TRANSACTION;
-CREATE TABLE IF NOT EXISTS "User" (
-	"UserID"	INTEGER,
-	"Email"	TEXT,
-	"Password"	TEXT,
-	"FullName"	TEXT,
-	PRIMARY KEY("UserID")
-);
-CREATE TABLE IF NOT EXISTS "BeanInBatch" (
-	"BatchID"	INTEGER NOT NULL,
-	"BeanID"	INTEGER NOT NULL,
-	FOREIGN KEY("BatchID") REFERENCES "Batch"("BatchID")
-);
-CREATE TABLE IF NOT EXISTS "ProcessingMethod" (
-	"ProcessingMethodID"	INTEGER,
-	"Name"	TEXT,
-	"Description"	TEXT,
-	PRIMARY KEY("ProcessingMethodID")
-);
-CREATE TABLE IF NOT EXISTS "Bean" (
-	"BeanID"	INTEGER,
-	"Name"	TEXT,
-	"Species"	TEXT,
-	"FarmID"	INTEGER,
-	FOREIGN KEY("FarmID") REFERENCES "Farm"("FarmID") ON UPDATE CASCADE ON DELETE CASCADE,
-	PRIMARY KEY("BeanID")
-);
-CREATE TABLE IF NOT EXISTS "Batch" (
-	"BatchID"	INTEGER,
-	"HarvestYear"	NUMERIC,
-	"PricePerKilo"	NUMERIC,
-	"ProcessingMethodID"	INTEGER NOT NULL,
-	"CoffeeID"	INTEGER NOT NULL,
-	"FarmID"	INTEGER NOT NULL,
-	FOREIGN KEY("CoffeeID") REFERENCES "Coffee"("CoffeeID") ON UPDATE CASCADE ON DELETE CASCADE,
-	FOREIGN KEY("ProcessingMethodID") REFERENCES "ProcessingMethod"("ProcessingMethodID") ON UPDATE CASCADE ON DELETE CASCADE,
-	FOREIGN KEY("FarmID") REFERENCES "ProcessingMethod"("ProcessingMethodID") ON UPDATE CASCADE ON DELETE CASCADE,
-	PRIMARY KEY("BatchID")
-);
+DROP TABLE IF EXISTS "Post";
 CREATE TABLE IF NOT EXISTS "Post" (
 	"PostID"	INTEGER,
-	"TastingNotes"	TEXT,
-	"TastingDates"	NUMERIC,
+	"tastingnotes"	TEXT,
+	"tastingdate"	NUMERIC,
 	"UserID"	INTEGER NOT NULL,
 	"CoffeeID"	INTEGER NOT NULL,
-	FOREIGN KEY("UserID") REFERENCES "User"("UserID"),
-	FOREIGN KEY("CoffeeID") REFERENCES "Coffee"("CoffeeID"),
+	"points"	INTEGER,
+	FOREIGN KEY("CoffeeID") REFERENCES "Coffee"("CoffeeID") ON UPDATE CASCADE ON DELETE CASCADE,
+	FOREIGN KEY("UserID") REFERENCES "User"("UserID") ON UPDATE CASCADE ON DELETE CASCADE,
 	PRIMARY KEY("PostID")
 );
-CREATE TABLE IF NOT EXISTS "Coffee" (
-	"CoffeeID"	INTEGER,
-	"RoastDegree"	TEXT,
-	"RoastedDate"	NUMERIC,
-	"Name"	TEXT,
-	"Description"	TEXT,
-	"PricePerKilo"	NUMERIC,
-	"Roastery"	INTEGER,
-	"BatchID"	INTEGER NOT NULL,
-	FOREIGN KEY("BatchID") REFERENCES "Batch"("BatchID") ON UPDATE CASCADE ON DELETE CASCADE,
-	PRIMARY KEY("CoffeeID")
-);
-CREATE TABLE IF NOT EXISTS "Farm" (
-	"FarmID"	INTEGER,
-	"Masl"	NUMERIC,
-	"Region"	TEXT,
-	"Country"	TEXT,
-	PRIMARY KEY("FarmID")
-);
+INSERT INTO "Post" ("PostID","tastingnotes","tastingdate","UserID","CoffeeID","points") VALUES (1,'floral','10.3.2022',1,1,10);
+INSERT INTO "Post" ("PostID","tastingnotes","tastingdate","UserID","CoffeeID","points") VALUES (2,'bland','11.3.2022',1,3,5);
+INSERT INTO "Post" ("PostID","tastingnotes","tastingdate","UserID","CoffeeID","points") VALUES (3,'amazing','07.02.2022',2,5,9);
+INSERT INTO "Post" ("PostID","tastingnotes","tastingdate","UserID","CoffeeID","points") VALUES (4,'floral','2022-03-25',4,1,7);
+INSERT INTO "Post" ("PostID","tastingnotes","tastingdate","UserID","CoffeeID","points") VALUES (5,'banan','2022-03-25',4,6,8);
 COMMIT;

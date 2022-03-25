@@ -57,7 +57,7 @@ def valueForMoney():
     print("\nPrinting Highest Average Score to Price Ratio")
     cursor = con.cursor()
     print("Coffee Name | Price Per Kilo ,- | Roastery | Average Score To Price Ratio")
-    for row in cursor.execute("SELECT C.name, C.priceperkilo, C.roastery, AVG(P.points)/C.priceperkilo AS AvgScoreToPriceRatio FROM Coffee AS C LEFT JOIN Post AS P WHERE C.CoffeeID = P.CoffeeID ORDER BY AvgScoreToPriceRatio DESC"):
+    for row in cursor.execute("SELECT C.name, C.priceperkilo, C.roastery, AVG(P.points)/C.priceperkilo AS AvgScoreToPriceRatio FROM Coffee AS C INNER JOIN Post AS P WHERE C.CoffeeID = P.CoffeeID GROUP BY P.CoffeeID ORDER BY AvgScoreToPriceRatio DESC"):
                     print(row)
 
 def searchKeyword():
